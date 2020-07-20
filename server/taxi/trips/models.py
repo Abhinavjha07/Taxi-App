@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 import uuid
 
 from django.shortcuts import reverse
+from django.conf import settings
 
 # Create your models here.
 class User(AbstractUser):
@@ -27,6 +28,21 @@ class Trip(models.Model):
     drop_off_address = models.CharField(max_length=255)
     status = models.CharField(
         max_length=20, choices=STATUSES,default=REQUESTED
+    )
+    driver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null = True,
+        blank = True,
+        on_delete=models.DO_NOTHING,
+        related_name='trips_as_driver'
+    )
+
+    rider = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        related_name='trips_as_rider'
     )
 
     def __str__(self):
