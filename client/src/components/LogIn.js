@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
-import { Breadcrumb, Button , Card, Col, Row, Form } from 'react-bootstrap';
+import { Breadcrumb, Button , Card, Col, Row, Form , Alert } from 'react-bootstrap';
 
-function LogIn(props) {
+function LogIn({ logIn }) {
 
-    const [isSubmitted, setSubmitted] = useState(false);
+    // const [isSubmitted, setSubmitted] = useState(false);
 
-    const onSubmit = (values, actions) => setSubmitted(true);
+    const onSubmit = async (values, actions) => {
+        try{
+            const { response, isError } = await logIn(
+                values.username, values.password );
+            
+            if(isError) {
+                const data = response.response.data;
+                for (const value in data) {
+                    actions.setFieldError(value, data[value].join(' '));
+                }
+            }
+        }
+        catch(error) {
+            console.error(error);
+        }
+        finally {
+            actions.setSubmitting(false);
+        }
+    };
 
-    if(isSubmitted) {
-        return <Redirect to='/' />;
-    }
+    // if(isSubmitted) {
+    //     return <Redirect to='/' />;
+    // }
 
     return (
         <Row>
@@ -31,10 +49,20 @@ function LogIn(props) {
                         onSubmit={onSubmit} 
                         >
                             {({
+                                errors,
                                 handleChange,
                                 handleSubmit,
+                                isSubmitting,
                                 values
                             }) => (
+                                <>
+                                    {
+                                        '__all__' in errors && 
+                                        <Alert variant='danger'>
+                                            {errors['__all__']}
+                                        </Alert>
+                                    }
+                                
                                 <Form noValidate onSubmit={handleSubmit}>
                                     <Form.Group controlId='username'>
                                         <Form.Label>Username:</Form.Label>
@@ -54,6 +82,8 @@ function LogIn(props) {
                                     </Form.Group>
                                     <Button block type='submit' variant='primary'>Log In</Button>
                                 </Form>
+
+                                </>
                             )}
                         </Formik>
                     </Card.Body>
