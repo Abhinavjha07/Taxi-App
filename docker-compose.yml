@@ -22,7 +22,7 @@ services:
             - static:/usr/src/app/static
         command: daphne --bind 0.0.0.0 --port 8000 taxi.asgi:application
         container_name: taxi-server
-        restart: always
+
         depends_on: 
             - taxi-redis
             - taxi-database
@@ -31,8 +31,7 @@ services:
             
         ports: 
             - 8001:8000
-        volumes: 
-            - ./server:/usr/src/app
+        
 
     taxi-client:
         build: 
@@ -58,7 +57,7 @@ services:
             - taxi-server
             - taxi-client
         ports:
-            8080:80
+            - 8080:80
         restart: always
         volumes: 
             - media:/usr/src/app/media

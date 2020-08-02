@@ -2,15 +2,17 @@ const logIn = () => {
     const { username, password } = Cypress.env('credentials');
 
     cy.server();
-    cy.route({
-        method:'POST',
-        url: '**/api/log_in/**',
-        status: 200,
-        response: {
-            'access': 'ACCESS_TOKEN',
-            'refresh': 'REFRESH_TOKEN'
-        }
-    }).as('logIn');
+    cy.route('POST', '**/api/log_in/**').as('logIn');
+
+    // cy.route({
+    //     method:'POST',
+    //     url: '**/api/log_in/**',
+    //     status: 200,
+    //     response: {
+    //         'access': 'ACCESS_TOKEN',
+    //         'refresh': 'REFRESH_TOKEN'
+    //     }
+    // }).as('logIn');
 
     cy.visit('/#/log-in');
     cy.get('input#username').type(username);
@@ -21,29 +23,26 @@ const logIn = () => {
 
 
 describe('Authentication', function() {
-    it('Can log in.', function() {
-        
-        logIn();
-        cy.hash().should('eq', '#/');
-        
+    before(function () { 
+        cy.task('tableTruncate', { table: 'trips_user' });  
     });
 
     it('Can Sign Up', function() {
         cy.server();
-        cy.route({
-            method: 'POST',
-            url: '**/api/sign_up/**',
-            status: 201,
-            response: {
-                'id': 1,
-                'username': 'abhinav.jha@example.com',
-                'first_name': 'Abhinav',
-                'last_name': 'Jha',
-                'group': 'driver',
-                'photo': '/media/images/photo.jpg'
-            }
-        }).as('signUp');
-
+        cy.route('POST', '**/api/sign_up/**').as('signUp');
+        // cy.route({
+        //     method: 'POST',
+        //     url: '**/api/sign_up/**',
+        //     status: 201,
+        //     response: {
+        //         'id': 1,
+        //         'username': 'abhinav.jha@example.com',
+        //         'first_name': 'Abhinav',
+        //         'last_name': 'Jha',
+        //         'group': 'driver',
+        //         'photo': '/media/images/photo.jpg'
+        //     }
+        // }).as('signUp');
 
         cy.visit('/#/sign-up');
         cy.get('input#username').type('abhinav.jha@example.com');
@@ -52,18 +51,28 @@ describe('Authentication', function() {
         cy.get('input#password').type('pAssw0rd', { log: false});
         cy.get('select#group').select('driver');
 
-        cy.fixture('images/photo.jpg').then(photo => {
-            cy.get('input#photo').attachFile({
-                fileContent: photo,
-                fileName: 'photo.jpg',
-                mimeType: 'application/json'
-            });
-        });
+        // cy.fixture('images/photo.jpg').then(photo => {
+        //     cy.get('input#photo').attachFile({
+        //         fileContent: photo,
+        //         fileName: 'photo.jpg',
+        //         mimeType: 'application/json'
+        //     });
+        // });
 
         cy.get('button').contains('Sign Up').click();
         cy.wait('@signUp');
         cy.hash().should('eq', '#/log-in');
     });
+
+    
+    it('Can log in.', function() {
+        
+        logIn();
+        cy.hash().should('eq', '#/');
+        
+    });
+
+    
 
     it('Cannot visit the login page when logged in.', function() {
         

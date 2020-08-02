@@ -25,8 +25,12 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
         data['password'] = validated_data['password1']
+
+        print(data['photo'])
         user = self.Meta.model.objects.create_user(**data)
         user.groups.add(group)
+
+        
         user.save()
 
         return user
@@ -44,6 +48,7 @@ class LogInSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         user_data = UserSerializer(user).data
+
         for key, value in user_data.items():
             if key != 'id':
                 token[key] = value

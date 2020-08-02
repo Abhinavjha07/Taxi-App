@@ -2,11 +2,18 @@ import React, { useState } from 'react';
 import { Button, Form, Container, Navbar } from 'react-bootstrap';
 import { LinkContainer} from 'react-router-bootstrap'
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
-import './App.css';
+
 
 import SignUp from './components/SignUp';
 import LogIn from './components/LogIn';
 import axios from 'axios';
+
+import Driver from './components/Driver';
+import Rider from './components/Rider';
+import { isDriver, isRider } from './services/AuthService'
+
+import './App.css';
+
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(() => {
@@ -41,7 +48,7 @@ function App() {
     <div>
       <Navbar bg='light' expand='lg' variant='light'>
         <LinkContainer to='/'>
-          <Navbar.Brand classname='logo'>Taxi</Navbar.Brand>
+          <Navbar.Brand className='logo'>Taxi</Navbar.Brand>
         </LinkContainer>
 
         <Navbar.Toggle />
@@ -62,18 +69,33 @@ function App() {
                 <h1 className='landing logo'>Taxi</h1>
                 {
                   !isLoggedIn &&
-                  <Link 
-                    id='signUp'
-                    className='btn btn-primary' 
-                    to='/sign-up'>
-                    Sign Up</Link>
+                  (
+                    <>
+                      <Link 
+                        id='signUp'
+                        className='btn btn-primary' 
+                        to='/sign-up'>
+                        Sign Up</Link>
+
+                      <Link 
+                        id='logIn'
+                        className='btn btn-primary' to='/log-in'>
+                        Log In</Link>
+                    </>
+                  )
                 }
                 {
-                  !isLoggedIn &&
-                  <Link 
-                    id='logIn'
-                    className='btn btn-primary' to='/log-in'>Log In</Link> 
+
+                  isRider() && (
+                    <Link className='btn btn-primary' to='/rider'>Dashboard</Link>
+                  )
                 }
+                {
+                  isDriver() && (
+                    <Link className='btn btn-primary' to='/driver'>Dashboard</Link>
+                  )
+                }
+
               </div>
           )} />
 
@@ -91,6 +113,15 @@ function App() {
             <LogIn logIn={logIn} />
             )
           )} />
+
+          <Route path='/driver' render={() => (
+            <Driver />
+          )} />
+
+          <Route path='/rider' render={() => (
+            <Rider />
+          )} />
+
         </Switch>
       </Container>
     </div>

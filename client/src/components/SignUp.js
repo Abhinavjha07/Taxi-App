@@ -21,11 +21,15 @@ function SignUp (props) {
         formData.append('group', values.group);
         formData.append('photo', values.photo);
 
+        console.log(formData);
+
         try {
             await axios.post(url, formData);
             setSubmitted(true);
         }
         catch(response) {
+
+            console.log(response);
             const data = response.response.data;
             for (const value in data) {
                 actions.setFieldError(value, data[value].join(' '));
